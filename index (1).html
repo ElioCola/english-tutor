@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Tutor · Elio</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F5F0;--surface:#FFFFFF;--surface2:#F0EDE8;--border:#E2DDD6;--text:#1A1714;--muted:#7A7570;--accent:#2C5F4A;--accent-light:#E8F2EE;--warn:#C0392B;--warn-light:#FCECEA;--ok:#2C5F4A;--ok-light:#E8F2EE;--gold:#B8860B;--gold-light:#FFF8E6;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.shell{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--surface);border-right:1px solid var(--border);padding:1.25rem 1rem;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto}
+.main{margin-left:230px;flex:1;padding:2rem;max-width:800px}
+.logo{font-family:'Lora',serif;font-size:17px;font-weight:500;color:var(--accent);margin-bottom:2px}
+.logo-sub{font-size:11px;color:var(--muted);margin-bottom:1.25rem}
+.level-badge{background:var(--accent-light);color:var(--accent);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;text-align:center;margin-bottom:1rem}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1.25rem}
+.stat-box{background:var(--surface2);border-radius:var(--radius-sm);padding:8px;text-align:center}
+.stat-num{font-size:18px;font-weight:500;color:var(--text)}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:1px}
+.nav-section{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .4rem}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--muted);transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:500}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.5;flex-shrink:0}
+.nav-item.active .nav-dot{opacity:1}
+.xp-bar-wrap{margin-top:auto;padding-top:1rem;border-top:1px solid var(--border)}
+.xp-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px}
+.xp-bar{height:5px;background:var(--border);border-radius:3px}
+.xp-fill{height:5px;background:var(--accent);border-radius:3px;transition:width .5s ease}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem}
+.page-header{margin-bottom:1.5rem}
+.page-title{font-family:'Lora',serif;font-size:24px;color:var(--text);margin-bottom:3px}
+.page-sub{font-size:13px;color:var(--muted)}
+.reading-box{background:var(--gold-light);border:1px solid #E8D8A0;border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.reading-label{font-size:10px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
+.reading-text{font-family:'Lora',serif;font-size:14px;line-height:1.9;color:var(--text)}
+.reading-text em{background:#FFE88A;border-radius:3px;padding:0 3px;font-style:normal;font-weight:500}
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px;margin-top:.75rem}
+.vocab-chip{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 11px}
+.vocab-en{font-size:13px;font-weight:500;color:var(--text)}
+.vocab-it{font-size:11px;color:var(--muted);margin-top:2px}
+.grammar-box{background:var(--accent-light);border:1px solid #B8D4C8;border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.grammar-label{font-size:10px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
+.grammar-rule{font-size:14px;line-height:1.8;color:var(--text);margin-bottom:.6rem}
+.grammar-ex{background:var(--surface);border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin:6px 0;font-size:13px}
+.grammar-ex .en{font-style:italic;color:var(--text)}
+.grammar-ex .it{font-size:11px;color:var(--muted);margin-top:2px}
+.error-note{margin-top:.6rem;font-size:12px;color:var(--warn);background:var(--warn-light);padding:8px 12px;border-radius:var(--radius-sm)}
+.quiz-progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;font-size:12px;color:var(--muted)}
+.progress-dots{display:flex;gap:3px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.dot.done{background:var(--accent)}
+.dot.wrong-dot{background:var(--warn)}
+.dot.current{background:var(--accent);opacity:.4}
+.qtag{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+.qtext{font-family:'Lora',serif;font-size:16px;line-height:1.7;color:var(--text);margin-bottom:1rem}
+.options{display:flex;flex-direction:column;gap:7px}
+.opt{padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text);background:var(--surface);text-align:left;transition:all .15s;font-family:'DM Sans',sans-serif}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-light)}
+.opt.correct{background:var(--ok-light);border-color:var(--ok);color:var(--ok)}
+.opt.wrong{background:var(--warn-light);border-color:var(--warn);color:var(--warn)}
+.opt.reveal{background:var(--ok-light);border-color:var(--ok);color:var(--ok)}
+.fill-row{display:flex;gap:8px}
+.fill-input{flex:1;padding:10px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:'Lora',serif;color:var(--text);background:var(--surface)}
+.fill-input:focus{outline:none;border-color:var(--accent)}
+.fill-input.correct{border-color:var(--ok);background:var(--ok-light)}
+.fill-input.wrong{border-color:var(--warn);background:var(--warn-light)}
+.btn-check{padding:10px 18px;border:1px solid var(--accent);border-radius:var(--radius-sm);background:var(--accent);color:#fff;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn-check:hover{background:#1e4a37}
+.feedback-box{margin-top:.75rem;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;line-height:1.6;display:none}
+.feedback-box.show{display:block}
+.feedback-box.ok{background:var(--ok-light);border:1px solid #B8D4C8;color:var(--ok)}
+.feedback-box.bad{background:var(--warn-light);border:1px solid #F0B8B4;color:var(--warn)}
+.next-btn{margin-top:.75rem;padding:9px 22px;border-radius:20px;border:1px solid var(--accent);color:var(--accent);background:transparent;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none}
+.next-btn.show{display:inline-block}
+.next-btn:hover{background:var(--accent-light)}
+.levelup-banner{background:var(--gold-light);border:1px solid #E8D8A0;border-radius:var(--radius);padding:1rem;margin-bottom:1rem;text-align:center;display:none}
+.levelup-banner.show{display:block}
+.section-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1.25rem}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem}
+.metric-num{font-size:28px;font-weight:300;color:var(--accent)}
+.metric-lbl{font-size:12px;color:var(--muted);margin-top:3px}
+.history-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.history-row:last-child{border-bottom:none}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-ok{background:var(--ok-light);color:var(--ok)}
+.badge-warn{background:var(--warn-light);color:var(--warn)}
+.badge-gold{background:var(--gold-light);color:var(--gold)}
+.review-banner{background:#FFF3E0;border:1px solid #FFB74D;border-radius:var(--radius-sm);padding:9px 13px;font-size:12px;color:#7B4A00;margin-bottom:.75rem}
+.topic-btn{padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);cursor:pointer;font-size:13px;color:var(--text);transition:all .15s;font-family:'DM Sans',sans-serif}
+.topic-btn:hover{border-color:var(--accent);color:var(--accent)}
+.topic-btn.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500}
+@media(max-width:600px){.sidebar{display:none}.main{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="logo">English Tutor</div>
+  <div class="logo-sub">Elio's adaptive app</div>
+  <div class="level-badge" id="level-badge">Level B1</div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="s-streak">0</div><div class="stat-lbl">streak</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">answered</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-acc">—</div><div class="stat-lbl">accuracy</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-xp">0</div><div class="stat-lbl">XP</div></div>
+  </div>
+  <div class="nav-section">Study</div>
+  <button class="nav-item active" onclick="showPage('home')" id="nav-home"><span class="nav-dot"></span>Dashboard</button>
+  <button class="nav-item" onclick="showPage('grammar')" id="nav-grammar"><span class="nav-dot"></span>Grammar</button>
+  <button class="nav-item" onclick="showPage('vocab')" id="nav-vocab"><span class="nav-dot"></span>Vocabulary</button>
+  <button class="nav-item" onclick="showPage('business')" id="nav-business"><span class="nav-dot"></span>Business English</button>
+  <button class="nav-item" onclick="showPage('listening')" id="nav-listening"><span class="nav-dot"></span>Listening</button>
+  <button class="nav-item" onclick="showPage('reading')" id="nav-reading"><span class="nav-dot"></span>Reading</button>
+  <div class="nav-section">Progress</div>
+  <button class="nav-item" onclick="showPage('report')" id="nav-report"><span class="nav-dot"></span>My report</button>
+  <div class="xp-bar-wrap">
+    <div class="xp-label"><span>Next level</span><span id="xp-text">0/100</span></div>
+    <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+  </div>
+</aside>
+<main class="main" id="main-content"></main>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+const SK='elio_tutor_v3';
+function defState(){return{level:2,xp:0,xpTotal:0,streak:0,lastDate:'',totalAnswered:0,totalCorrect:0,history:[],weakTopics:{},strongTopics:{},consCorrect:0,consWrong:0}}
+let S=loadS();
+function loadS(){try{return JSON.parse(localStorage.getItem(SK))||defState()}catch{return defState()}}
+function saveS(){localStorage.setItem(SK,JSON.stringify(S))}
+const LN=['','A2','B1','B1+','B2','B2+','C1'];
+const XPL=[0,0,80,150,250,400,600];
+function lvlName(){return LN[S.level]||'B1'}
+
+function addXP(n){
+  S.xp+=n;S.xpTotal+=n;
+  const need=XPL[S.level+1]||999;
+  if(S.xp>=need&&S.level<6){S.level++;S.xp=0;pendingLevelUp=true}
+  updateSidebar();saveS()
+}
+let pendingLevelUp=false;
+
+function updateSidebar(){
+  document.getElementById('level-badge').textContent='Level '+lvlName();
+  document.getElementById('s-streak').textContent=S.streak;
+  document.getElementById('s-total').textContent=S.totalAnswered;
+  document.getElementById('s-acc').textContent=S.totalAnswered?Math.round(S.totalCorrect/S.totalAnswered*100)+'%':'—';
+  document.getElementById('s-xp').textContent=S.xpTotal;
+  const need=XPL[S.level+1]||100;
+  document.getElementById('xp-fill').style.width=Math.min(100,Math.round(S.xp/need*100))+'%';
+  document.getElementById('xp-text').textContent=S.xp+'/'+need;
+}
+
+function recordAnswer(correct,topic){
+  S.totalAnswered++;
+  if(correct){S.totalCorrect++;S.consCorrect++;S.consWrong=0;S.strongTopics[topic]=(S.strongTopics[topic]||0)+1;if(S.weakTopics[topic]){S.weakTopics[topic]--;if(S.weakTopics[topic]<=0)delete S.weakTopics[topic]}addXP(10)}
+  else{S.consWrong++;S.consCorrect=0;S.weakTopics[topic]=(S.weakTopics[topic]||0)+1;addXP(2)}
+  if(S.consCorrect>=10&&S.level<6){S.level++;S.consCorrect=0;pendingLevelUp=true}
+  else if(S.consWrong>=6&&S.level>1){S.level--;S.consWrong=0}
+  updateSidebar();saveS()
+}
+
+// ── CONTENT DATABASE ───────────────────────────────────────────
+const DB = {
+
+// ════════════════════════════════════════════════════════
+// GRAMMAR
+// ════════════════════════════════════════════════════════
+grammar: [
+  {
+    id:'pp_intro', level:1, topic:'Present Perfect',
+    lesson:{
+      title:'Present Perfect — Introduction',
+      rule:'Use <strong>have/has + past participle</strong> for actions that happened in the past but are connected to the present, or for experiences without a specific time.',
+      rule_it:'In italiano usi spesso il passato prossimo anche con un tempo specifico ("ieri ho mangiato"). In inglese NON si fa così — con tempi specifici si usa il Past Simple.',
+      examples:[
+        {en:'I have never shared my bedroom.',it:'Non ho mai condiviso la mia camera.'},
+        {en:"She hasn't finished the report yet.",it:'Non ha ancora finito il rapporto.'},
+        {en:'Have you ever worked abroad?',it:'Hai mai lavorato all\'estero?'},
+        {en:'I have just sent the email.',it:'Ho appena mandato l\'email.'},
+      ],
+      error:"❌ 'I didn't finish yet' → ✅ 'I haven't finished yet'"
+    },
+    questions:[
+      {type:'mc',q:'Which sentence is correct?',opts:["I didn't never do that.","I have never done that.","I never did never that.","I haven't never done that."],ans:1,exp:"'Never' + Present Perfect: 'I have never done that.' Double negatives are wrong in English."},
+      {type:'mc',q:'Choose the correct form: "She ___ already sent the email."',opts:['did','has','was','have'],ans:1,exp:"Subject 'she' → 'has' in Present Perfect."},
+      {type:'fill',q:'Complete: "I ___ (not/read) a book for a long time."',ans:["haven't read","have not read"],exp:"Present Perfect negative: 'I haven't read a book for a long time.'"},
+      {type:'mc',q:'"Have you ever ___ to Dublin?"',opts:['go','went','gone','goes'],ans:2,exp:"Present Perfect uses past participle: 'Have you ever GONE to Dublin?'"},
+      {type:'mc',q:'Which time expression goes with Present Perfect?',opts:['yesterday','last week','in 2020','already'],ans:3,exp:"'Already','yet','ever','never','just','for','since' → Present Perfect. Specific past time → Past Simple."},
+      {type:'fill',q:'Make it Present Perfect: "He reads the report every day." → Today: "He ___ the report."',ans:["has read","has already read"],exp:"'He has read the report.' Past participle of 'read' is 'read' (pronounced /rɛd/)."},
+      {type:'mc',q:'"I ___ just ___ a great idea!"',opts:['did/have','have/had','had/have','has/had'],ans:1,exp:"'I have just had a great idea!' — 'just' goes between have and past participle."},
+      {type:'mc',q:'"The client ___ not replied yet." Choose the correct form.',opts:['did','has','is','was'],ans:1,exp:"'The client has not replied yet.' 'Yet' signals Present Perfect."},
+    ]
+  },
+  {
+    id:'past_simple', level:1, topic:'Past Simple',
+    lesson:{
+      title:'Past Simple — Regular & Irregular Verbs',
+      rule:'Past Simple describes <strong>completed actions at a specific time in the past</strong>. Regular verbs add -ed. Many common verbs are irregular.',
+      rule_it:'Usa il Past Simple quando c\'è un tempo specifico: yesterday, last week, in 2020, this morning (se è già passata), ecc.',
+      examples:[
+        {en:'They did not make it on time.',it:'Non ce la fecero in tempo.'},
+        {en:'He forgot his shoe because he was late.',it:'Dimenticò la scarpa perché era in ritardo.'},
+        {en:'Did they make it on time? No, they didn\'t.',it:'Arrivarono in tempo? No.'},
+        {en:'I worked at ShopFully for three years.',it:'Ho lavorato a ShopFully per tre anni. (periodo concluso)'},
+      ],
+      error:"❌ 'He didn't forgot' → ✅ 'He didn't forget' (base verb after did/didn't)"
+    },
+    questions:[
+      {type:'mc',q:'"Did they make it on time?" — correct short answer:',opts:["Yes, they made.","No, they didn't.","No, they didn't made.","No, they not did."],ans:1,exp:"Short answer: 'No, they didn't.' Never repeat the main verb."},
+      {type:'fill',q:'Complete: "He ___ (not/forget) his keys — he forgot his shoes."',ans:["didn't forget","did not forget"],exp:"Negative Past Simple: didn't + BASE verb. Not 'didn't forgot'."},
+      {type:'mc',q:'What is the Past Simple of "oversleep"?',opts:['oversleeped','overslept','did oversleep','was overslept'],ans:1,exp:"Irregular: oversleep → overslept (like sleep → slept)."},
+      {type:'mc',q:'Choose the correct question form:',opts:['Where did he went?','Where he went?','Where did he go?','Where has he went?'],ans:2,exp:"did + subject + BASE verb: 'Where did he go?'"},
+      {type:'mc',q:'"Last year I ___ at a conference in London."',opts:['have spoken','spoke','speak','had spoke'],ans:1,exp:"'Last year' = specific past time → Past Simple: 'I spoke at a conference.'"},
+      {type:'fill',q:'Complete: "She ___ (earn) €50,000 last year."',ans:["earned"],exp:"Regular verb + -ed: 'She earned €50,000 last year.'"},
+      {type:'mc',q:'"Why ___ he looking for a job?"',opts:['was','did','has','were'],ans:0,exp:"'Why was he looking for a job?' — Past Continuous for ongoing past action."},
+      {type:'mc',q:'Choose the irregular past: "I ___ the fault immediately."',opts:['recognized','recognizes','have recognized','recognizing'],ans:0,exp:"Regular verb: recognize → recognized."},
+    ]
+  },
+  {
+    id:'prepositions_time', level:1, topic:'Prepositions: for / since / from',
+    lesson:{
+      title:'Prepositions of Time: for, since, from',
+      rule:'<strong>For</strong> = duration ("for 3 years"). <strong>Since</strong> = starting point ("since 2020"). <strong>From</strong> is NOT used for duration in English — common Italian mistake!',
+      rule_it:'In italiano dici "lavoro qui da 3 anni" → in inglese: "I have worked here FOR 3 years." NON si dice "from 3 years".',
+      examples:[
+        {en:'I have studied English for three years.',it:'Studio inglese da tre anni.'},
+        {en:'I have lived in Milan since 2018.',it:'Vivo a Milano dal 2018.'},
+        {en:"I haven't read a book for a long time.",it:'Non leggo un libro da molto tempo.'},
+        {en:'She has worked at ShopFully since December 2024.',it:'Lavora a ShopFully da dicembre 2024.'},
+      ],
+      error:"❌ 'I don't read from many time' → ✅ 'I haven't read for a long time'"
+    },
+    questions:[
+      {type:'mc',q:'"I have studied English ___ 2022."',opts:['for','from','since','during'],ans:2,exp:"'Since' + point in time: 'since 2022.'"},
+      {type:'mc',q:'"I have studied English ___ three years."',opts:['since','from','during','for'],ans:3,exp:"'For' + duration: 'for three years.'"},
+      {type:'fill',q:'Correct: "I don\'t read from many time." → "I ___ for a long time."',ans:["haven't read","haven't read a book"],exp:"Two corrections: Present Perfect + 'for' not 'from'."},
+      {type:'mc',q:'Which is correct?',opts:["She works here from 10 years.","She has worked here for 10 years.","She works here since 10 years.","She worked here from 10 years."],ans:1,exp:"Ongoing: Present Perfect + 'for' + duration."},
+      {type:'mc',q:'"He has been a manager ___ he got promoted."',opts:['for','from','since','during'],ans:2,exp:"'Since' + event/point in time."},
+      {type:'fill',q:'Complete: "I have managed campaigns ___ over 8 years."',ans:["for"],exp:"'For' + duration period."},
+      {type:'mc',q:'"___ how long have you worked in AdTech?"',opts:['Since','From','For','During'],ans:2,exp:"Question with duration: 'For how long...' or 'How long have you...'"},
+    ]
+  },
+  {
+    id:'negation', level:1, topic:'No double negatives',
+    lesson:{
+      title:'No Double Negatives in English',
+      rule:'In English you can NEVER use two negatives in the same clause. Choose ONE: "I have never done it" OR "I haven\'t done it." Never both together.',
+      rule_it:'In italiano: "non ho mai fatto niente" (tre negative!). In inglese: "I have never done anything" oppure "I haven\'t done anything" — non entrambe.',
+      examples:[
+        {en:"I have never shared my room.",it:"Non ho mai condiviso la mia stanza."},
+        {en:"He doesn't have any money.",it:"Non ha soldi."},
+        {en:"I don't know anything.",it:"Non so niente."},
+        {en:"There is nothing I can do.",it:"Non c'è niente che io possa fare."},
+      ],
+      error:"❌ 'I don't have no money' → ✅ 'I don't have any money' or 'I have no money'"
+    },
+    questions:[
+      {type:'mc',q:'Choose the correct sentence:',opts:["I don't have no time.","I have no time.","I haven't no time.","I don't have none time."],ans:1,exp:"'I have no time' ✓ or 'I don't have any time' ✓ — never combine 'don't' + 'no'."},
+      {type:'mc',q:'"She ___ anything about the project."',opts:["doesn't know nothing","don't know nothing","doesn't know anything","isn't knowing nothing"],ans:2,exp:"'She doesn't know anything.' — negative verb + 'any-' words."},
+      {type:'fill',q:'Correct: "He doesn\'t have no experience." → "He doesn\'t have ___ experience."',ans:["any"],exp:"'He doesn't have any experience.'"},
+      {type:'mc',q:'"I ___ ___ about it." (no information)',opts:["don't know nothing","know nothing","don't know anything","both B and C"],ans:3,exp:"Both 'I know nothing' and 'I don't know anything' are correct. Never combine them."},
+      {type:'mc',q:'Which is wrong?',opts:["Nobody called.","I didn't call anyone.","I didn't call nobody.","No one answered."],ans:2,exp:"'I didn't call nobody' has a double negative → wrong. Use 'I didn't call anyone' or 'I called nobody'."},
+    ]
+  },
+  {
+    id:'pp_vs_ps', level:2, topic:'Present Perfect vs Past Simple',
+    lesson:{
+      title:'Present Perfect vs Past Simple — The Key Difference',
+      rule:'<strong>Past Simple</strong> = specific time in the past (finished). <strong>Present Perfect</strong> = no specific time, or connection to the present, or with ever/never/already/yet/just/for/since.',
+      rule_it:'Attenzione: "Have you ever been to London?" (PP, esperienza senza tempo specifico) vs "Did you go to London last year?" (PS, tempo specifico).',
+      examples:[
+        {en:'I visited Dublin in 2022.',it:'Ho visitato Dublino nel 2022. (specifico → PS)'},
+        {en:'I have visited Dublin three times.',it:'Ho visitato Dublino tre volte. (esperienza → PP)'},
+        {en:'Have you finished? — Yes, I just finished.',it:'Hai finito? — Sì, ho appena finito.'},
+        {en:'I have worked in AdTech since 2016.',it:'Lavoro in AdTech dal 2016. (ongoing → PP)'},
+      ],
+      error:"❌ 'Did you ever go to London?' → ✅ 'Have you ever been to London?'"
+    },
+    questions:[
+      {type:'mc',q:'"___ you ever ___ sushi?" (experience question)',opts:['Did/eat','Have/eaten','Did/eaten','Have/ate'],ans:1,exp:"Experience questions: 'Have you ever eaten sushi?'"},
+      {type:'mc',q:'"When ___ you ___ the email?" (specific time implied)',opts:['have/sent','did/send','have/send','did/sent'],ans:1,exp:"'When' + specific time = Past Simple: 'When did you send the email?'"},
+      {type:'fill',q:'"I ___ (just/finish) the presentation."',ans:["have just finished","'ve just finished"],exp:"'I have just finished the presentation.'"},
+      {type:'mc',q:'Best for a job interview: "I ___ in AdTech for 8 years and I still work there."',opts:["worked","have worked","was working","work"],ans:1,exp:"Ongoing from past to present: 'I have worked in AdTech for 8 years.' Key for interviews!"},
+      {type:'mc',q:'"The client ___ not replied yet."',opts:["didn't","hasn't","wasn't","don't"],ans:1,exp:"'Yet' → Present Perfect: 'The client hasn't replied yet.'"},
+      {type:'mc',q:'"I ___ to three interviews last month."',opts:['have gone','went','have went','go'],ans:1,exp:"'Last month' = specific past time → Past Simple: 'I went to three interviews last month.'"},
+      {type:'fill',q:'"She ___ (work) at Google before joining Meta."',ans:["worked","had worked"],exp:"Completed past action before another: 'She worked at Google before joining Meta.' (PS or Past Perfect both OK)"},
+      {type:'mc',q:'"This is the best campaign I ___ ever ___."',opts:['have/managed','did/manage','was/managing','had/manage'],ans:0,exp:"'This is the best... I have ever managed.' Superlative + PP."},
+    ]
+  },
+  {
+    id:'modal_verbs', level:2, topic:'Modal Verbs',
+    lesson:{
+      title:'Modal Verbs — can, could, should, must, might, would',
+      rule:'Modal verbs are followed by the <strong>BASE verb</strong> (no -s, no -ed, no -ing, no "to"). They express ability, possibility, obligation, advice.',
+      rule_it:'Errore comune degli italiani: "I should to go" ❌ — i modali NON vogliono "to" dopo di loro.',
+      examples:[
+        {en:'You should always confirm in writing.',it:'Dovresti sempre confermare per iscritto.'},
+        {en:'The client might increase the budget.',it:'Il cliente potrebbe aumentare il budget.'},
+        {en:'Can you send me the report by Friday?',it:'Puoi mandarmi il report entro venerdì?'},
+        {en:'We must meet the deadline.',it:'Dobbiamo rispettare la scadenza.'},
+      ],
+      error:"❌ 'She should to go' / 'She can speaks' → ✅ 'She should go' / 'She can speak'"
+    },
+    questions:[
+      {type:'mc',q:'"You ___ send a follow-up after the interview."',opts:['should to','should','must to','can to'],ans:1,exp:"'Should' + base verb, no 'to'."},
+      {type:'mc',q:'"The results ___ improve next week." (possibility)',opts:['might','must','should to','can to'],ans:0,exp:"'Might' = possibility."},
+      {type:'fill',q:'Complete: "___ you help me prepare?" (polite request)',ans:["could","can"],exp:"'Could you help me...' is more polite than 'Can you help me...'"},
+      {type:'mc',q:'Which is grammatically correct?',opts:["She can speaks fluently.","She can speak fluently.","She cans speak fluently.","She can to speak fluently."],ans:1,exp:"Modal + base verb: 'She can speak.' No -s, no 'to', no -ing."},
+      {type:'mc',q:'"You ___ not share confidential data with competitors."',opts:['should','must','might','can'],ans:1,exp:"'Must not' (mustn't) = prohibition/strong obligation not to do something."},
+      {type:'mc',q:'"I ___ attend — I have a conflict." (not able to)',opts:['might not','can\'t','shouldn\'t','won\'t'],ans:1,exp:"'Can't attend' = not able to attend."},
+      {type:'fill',q:'"We ___ (consider) all options before deciding." (obligation, formal)',ans:["must consider","should consider","ought to consider"],exp:"'We must consider all options.' — strong obligation."},
+      {type:'mc',q:'"___ I help you with the presentation?"',opts:['Must','Should','Could','Might'],ans:2,exp:"'Could I help you?' — polite offer."},
+    ]
+  },
+  {
+    id:'first_cond', level:2, topic:'First Conditional',
+    lesson:{
+      title:'First Conditional — Real Possibilities',
+      rule:'<strong>If + Present Simple, will + base verb.</strong> Used for real, likely situations in the future.',
+      rule_it:'La struttura "if" non vuole mai "will" nella clausola con IF. "If I will go" ❌ — "If I go" ✓.',
+      examples:[
+        {en:'If you make it on time, the kits are free.',it:'Se arrivi in tempo, i kit sono gratis.'},
+        {en:"If I get the job, I'll move to Dublin.",it:'Se ottengo il lavoro, mi trasferirò a Dublino.'},
+        {en:"If the campaign performs well, the client will increase the budget.",it:"Se la campagna va bene, il cliente aumenterà il budget."},
+        {en:"If you don't reply, I'll follow up.",it:"Se non rispondi, ti manderò un follow-up."},
+      ],
+      error:"❌ 'If I will go...' — NEVER use 'will' in the IF clause!"
+    },
+    questions:[
+      {type:'mc',q:'"If the meeting ___ at 3pm, I\'ll be there."',opts:['will start','starts','is starting','started'],ans:1,exp:"If clause = Present Simple (never 'will')."},
+      {type:'mc',q:'"If she ___ the report, the boss ___ happy."',opts:['sends/will be','will send/is','sent/will be','sends/would be'],ans:0,exp:"First conditional: If + Present Simple, will + base."},
+      {type:'fill',q:'"If you don\'t reply, I ___ (follow) up tomorrow."',ans:["will follow","'ll follow"],exp:"'I will follow up tomorrow.'"},
+      {type:'mc',q:'"___ you call me if you have any problems?"',opts:['Do','Would','Will','Should'],ans:2,exp:"'Will you call me if you have any problems?' — future request."},
+      {type:'mc',q:'"If the campaign ___ well, we ___ the budget."',opts:['performs/will increase','will perform/increase','performs/increase','perform/will increase'],ans:0,exp:"If + PS, will + base."},
+      {type:'fill',q:'"If I ___ (get) the Dublin job, I will relocate immediately."',ans:["get"],exp:"If clause uses Present Simple: 'If I get the Dublin job...'"},
+    ]
+  },
+  {
+    id:'second_cond', level:3, topic:'Second Conditional',
+    lesson:{
+      title:'Second Conditional — Hypothetical Situations',
+      rule:'<strong>If + Past Simple, would + base verb.</strong> Used for hypothetical, unlikely, or imaginary present/future situations.',
+      rule_it:'"Were" è la forma formale corretta per tutti i soggetti nel secondo condizionale: "If I were you..." (non "If I was you" nel registro formale).',
+      examples:[
+        {en:"If I were fluent in English, I'd apply for more international roles.",it:"Se fossi fluente in inglese, mi candiderei a più ruoli internazionali."},
+        {en:"If I had more budget, I would test more channels.",it:"Se avessi più budget, testerei più canali."},
+        {en:"What would you do if you lost your biggest client?",it:"Cosa faresti se perdessi il tuo cliente più importante?"},
+        {en:"If she were the manager, she would change the process.",it:"Se fosse il manager, cambierebbe il processo."},
+      ],
+      error:"❌ 'If I would have more time...' → ✅ 'If I had more time...' (no 'would' in IF clause!)"
+    },
+    questions:[
+      {type:'mc',q:'"If I ___ the CEO, I ___ invest more in AdTech."',opts:['was/will','were/would','am/would','was/would have'],ans:1,exp:"Second conditional: 'If I were the CEO, I would invest...'"},
+      {type:'mc',q:'"What ___ you do if you ___ more budget?"',opts:['will/have','would/had','would/have','will/had'],ans:1,exp:"'What would you do if you had more budget?'"},
+      {type:'fill',q:'"If I ___ (speak) better English, I would get more international clients."',ans:["spoke"],exp:"Second conditional: If + Past Simple. 'If I spoke better English...'"},
+      {type:'mc',q:'Which is a Second Conditional?',opts:["If it rains, I'll take an umbrella.","If I had a car, I would drive to work.","If you call me, I will answer.","When I finish, I'll send you the report."],ans:1,exp:"'If I had a car, I would drive' — hypothetical present → Second Conditional."},
+      {type:'mc',q:'"If she ___ more experience, she ___ get the job easily."',opts:['has/will','had/would','would have/got','has/would'],ans:1,exp:"'If she had more experience, she would get the job easily.'"},
+    ]
+  },
+  {
+    id:'third_cond', level:3, topic:'Third Conditional',
+    lesson:{
+      title:'Third Conditional — Impossible Past',
+      rule:'<strong>If + Past Perfect, would have + past participle.</strong> Used for imagining a different outcome in the past — it cannot change now.',
+      rule_it:'Il terzo condizionale serve per i rimpianti: "Se mi fossi preparato meglio, avrei superato il colloquio." Azione passata impossibile da cambiare.',
+      examples:[
+        {en:"If I had prepared more, I would have passed the interview.",it:"Se mi fossi preparato di più, avrei superato il colloquio."},
+        {en:"If they had applied earlier, they would have received the discount.",it:"Se si fossero candidati prima, avrebbero ricevuto lo sconto."},
+        {en:"She wouldn't have overslept if she had set an alarm.",it:"Non avrebbe dormito troppo se avesse impostato la sveglia."},
+      ],
+      error:"❌ 'If I would have studied...' → ✅ 'If I had studied...' — NEVER 'would' in the IF clause!"
+    },
+    questions:[
+      {type:'mc',q:'"If you ___ earlier, you ___ the discount."',opts:['had applied/would have received','applied/would receive','would apply/had received','apply/will receive'],ans:0,exp:"Third conditional: 'If you had applied earlier, you would have received the discount.'"},
+      {type:'mc',q:'"She ___ the job if she ___ better English."',opts:['would have got/had spoken','would get/spoke','would have get/had spoken','got/would speak'],ans:0,exp:"'She would have got the job if she had spoken better English.'"},
+      {type:'fill',q:'"If they ___ (make) it on time, the kits ___ (be) free."',ans:["had made / would have been","had made, the kits would have been"],exp:"'If they had made it on time, the kits would have been free.'"},
+      {type:'mc',q:'Which is a Third Conditional?',opts:["If I study, I'll pass.","If I studied, I'd pass.","If I had studied, I would have passed.","If I study more, I would pass."],ans:2,exp:"Past Perfect + would have = Third Conditional."},
+    ]
+  },
+  {
+    id:'passive', level:3, topic:'Passive Voice',
+    lesson:{
+      title:'Passive Voice',
+      rule:'<strong>Subject + be + past participle.</strong> Used when the action matters more than the doer, or the doer is unknown.',
+      rule_it:'"Da" in italiano = "by" in inglese nel passivo: "La campagna è stata gestita DA me" → "The campaign was managed BY me."',
+      examples:[
+        {en:'The campaign was launched in January.',it:'La campagna è stata lanciata a gennaio.'},
+        {en:'The budget has been increased by the client.',it:'Il budget è stato aumentato dal cliente.'},
+        {en:'Ads are targeted based on user behaviour.',it:'Gli annunci vengono targettizzati in base al comportamento degli utenti.'},
+        {en:'The report will be sent tomorrow.',it:'Il report verrà inviato domani.'},
+      ],
+      error:"❌ 'The report was written from me' → ✅ 'The report was written BY me'"
+    },
+    questions:[
+      {type:'mc',q:'"The results ___ by the data team every week."',opts:['are analysed','are analysing','have analysed','analyse'],ans:0,exp:"Passive present simple: 'The results are analysed by the data team.'"},
+      {type:'mc',q:'"The presentation ___ before the meeting." (past passive)',opts:['was prepared','prepared','has prepared','were prepared'],ans:0,exp:"Past simple passive: 'The presentation was prepared.'"},
+      {type:'fill',q:'Make passive: "Google rejected the application." → "The application ___ by Google."',ans:["was rejected"],exp:"Past simple passive: 'The application was rejected by Google.'"},
+      {type:'mc',q:'"New products ___ in the next quarter." (future passive)',opts:['will launch','will be launching','will be launched','are launched'],ans:2,exp:"Future passive: 'will be + past participle': 'will be launched.'"},
+      {type:'mc',q:'"The meeting ___ due to technical issues."',opts:['was cancelled','cancelled','was cancelling','has cancelling'],ans:0,exp:"'The meeting was cancelled due to technical issues.'"},
+      {type:'fill',q:'Complete: "The data ___ (analyse) and a report ___ (send) to the client."',ans:["was analysed and a report was sent","were analysed and a report was sent","has been analysed and a report has been sent"],exp:"'The data was analysed and a report was sent to the client.'"},
+    ]
+  },
+  {
+    id:'reported_speech', level:2, topic:'Reported Speech',
+    lesson:{
+      title:'Reported Speech — Saying What Others Said',
+      rule:'When reporting what someone said, verbs shift back one tense: say→said, will→would, can→could, is→was, has→had.',
+      rule_it:'"He said: I will call you" → "He said he would call me." I pronomi e i tempi cambiano.',
+      examples:[
+        {en:'"I work in AdTech." → She said she worked in AdTech.',it:'Disse che lavorava in AdTech.'},
+        {en:'"I will send the report." → He said he would send the report.',it:'Disse che avrebbe mandato il report.'},
+        {en:'"Can you help me?" → She asked if I could help her.',it:'Chiese se potevo aiutarla.'},
+      ],
+      error:"❌ 'She said she will call' → ✅ 'She said she would call'"
+    },
+    questions:[
+      {type:'mc',q:'"I am working on the campaign." → She said she ___ on the campaign.',opts:['is working','was working','will work','worked'],ans:1,exp:"Present Continuous → Past Continuous in reported speech."},
+      {type:'mc',q:'"I can attend the meeting." → He said he ___ attend the meeting.',opts:['can','could','will','would'],ans:1,exp:"Can → could in reported speech."},
+      {type:'fill',q:'"I will send you the data." → She said she ___ send me the data.',ans:["would"],exp:"Will → would in reported speech."},
+      {type:'mc',q:'"Are you free on Friday?" → He asked if I ___ free on Friday.',opts:['am','was','were','been'],ans:1,exp:"Am → was in reported speech questions."},
+    ]
+  },
+  {
+    id:'articles', level:2, topic:'Articles: a, an, the',
+    lesson:{
+      title:'Articles: a / an / the',
+      rule:'<strong>A/an</strong> = first mention, one of many. <strong>The</strong> = specific, already mentioned, or unique. <strong>No article</strong> = general/abstract nouns, names, countries (most).',
+      rule_it:'L\'italiano non usa spesso gli articoli come l\'inglese. "Vado al lavoro" = "I go to work" (no article). "Vado al mercato" = "I go to the market" (the = specifico).',
+      examples:[
+        {en:'I had a great meeting this morning.',it:'Ho avuto un ottimo incontro stamattina.'},
+        {en:'The meeting I mentioned was with Google.',it:'La riunione che ho menzionato era con Google.'},
+        {en:'She works in advertising.',it:'Lavora nella pubblicità. (no article for general field)'},
+        {en:'The internet has changed advertising forever.',it:'Internet ha cambiato la pubblicità per sempre.'},
+      ],
+      error:"❌ 'I am the manager of team' → ✅ 'I am the manager of the team' or 'I am a manager'"
+    },
+    questions:[
+      {type:'mc',q:'"She is ___ account manager at Google."',opts:['a','an','the','—'],ans:0,exp:"First mention, singular countable noun: 'She is A account manager.' (actually 'AN' before vowel sound — but 'account' starts with vowel → 'AN account manager')"},
+      {type:'mc',q:'"She is ___ account manager at Google." (correct choice)',opts:['a','an','the','—'],ans:1,exp:"'AN account manager' — use 'an' before vowel sounds."},
+      {type:'mc',q:'"I work in ___ AdTech industry."',opts:['a','an','the','—'],ans:2,exp:"'The AdTech industry' — unique/specific industry."},
+      {type:'fill',q:'"I had ___ interview yesterday. ___ interview went really well."',ans:["an / The","an interview yesterday. The interview"],exp:"First mention: 'an interview.' Second mention (specific): 'The interview.'"},
+      {type:'mc',q:'"___ money is important, but so is job satisfaction."',opts:['A','An','The','—'],ans:3,exp:"Abstract/general sense: no article. 'Money is important...'"},
+    ]
+  },
+  {
+    id:'rel_clauses', level:3, topic:'Relative Clauses',
+    lesson:{
+      title:'Relative Clauses — who, which, that, whose',
+      rule:'<strong>Who</strong> for people, <strong>which</strong> for things, <strong>that</strong> for people or things (informal), <strong>whose</strong> for possession.',
+      rule_it:'"La persona che ha chiamato" = "The person who called." "L\'azienda per cui lavoro" = "The company I work for" (o "for which I work").',
+      examples:[
+        {en:'The manager who interviewed me was very professional.',it:'Il manager che mi ha intervistato era molto professionale.'},
+        {en:'The campaign which we launched exceeded all targets.',it:'La campagna che abbiamo lanciato ha superato tutti gli obiettivi.'},
+        {en:'This is the client whose budget we manage.',it:'Questo è il cliente di cui gestiamo il budget.'},
+      ],
+      error:"❌ 'The company which people work there' → ✅ 'The company where people work'"
+    },
+    questions:[
+      {type:'mc',q:'"The colleague ___ helped me is now a director."',opts:['which','whose','who','what'],ans:2,exp:"'Who' for people: 'The colleague who helped me...'"},
+      {type:'mc',q:'"The tool ___ we use tracks impressions in real time."',opts:['who','whose','what','which'],ans:3,exp:"'Which' for things: 'The tool which we use...' (or 'that we use')"},
+      {type:'fill',q:'"That\'s the client ___ company spent €2M on advertising last year."',ans:["whose"],exp:"'Whose' for possession: 'the client whose company spent...'"},
+      {type:'mc',q:'"Dublin is the city ___ I want to relocate."',opts:['which','where','who','what'],ans:1,exp:"'Where' for places: 'the city where I want to relocate.'"},
+    ]
+  },
+],
+
+// ════════════════════════════════════════════════════════
+// VOCABULARY
+// ════════════════════════════════════════════════════════
+vocab: [
+  {
+    id:'v_everyday', level:1, topic:'Everyday Vocabulary (from your lessons)',
+    lesson:{
+      title:'Key Words from Your Lessons',
+      text:'Every morning, one of the two brothers would <em>oversleep</em> and miss the chance to get the free gingerbread house kit. It was never his <em>fault</em> — at least that\'s what he said. He needed to <em>earn</em> money to buy one, but his <em>savings</em> were almost gone. His room was always <em>messy</em>, unlike his brother\'s <em>neat</em> space. The teacher would <em>hand out</em> the <em>supplies</em> at the start of each class, and students who arrived late found nothing left.',
+      vocab:[
+        {en:'oversleep',it:'dormire troppo / svegliarsi tardi',ex:'He overslept and missed the meeting.'},
+        {en:'fault',it:'colpa',ex:"It's not my fault — I was stuck in traffic."},
+        {en:'earn',it:'guadagnare',ex:'She earns a competitive salary.'},
+        {en:'savings',it:'risparmi',ex:'I used my savings to buy a new laptop.'},
+        {en:'messy',it:'disordinato',ex:'His desk is messy but he knows where everything is.'},
+        {en:'neat',it:'ordinato',ex:'She keeps her workspace very neat.'},
+        {en:'hand out',it:'distribuire',ex:'Please hand out the agenda before the meeting.'},
+        {en:'supplies',it:'materiali / scorte',ex:'We ran out of office supplies.'},
+        {en:'weird',it:'strano',ex:'That was a weird request from the client.'},
+        {en:'make it on time',it:'farcela in tempo',ex:"If we leave now, we'll make it on time."},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'What does "oversleep" mean?',opts:['Dormire troppo poco','Dormire più del dovuto','Andare a letto tardi','Svegliarsi presto'],ans:1,exp:"'Oversleep' = dormire oltre l'orario previsto. Irregular: overslept."},
+      {type:'mc',q:'"Earnings" means:',opts:['Risparmi','Guadagni','Colpa','Scorte'],ans:1,exp:"'Earnings' = guadagni. 'Savings' = risparmi."},
+      {type:'mc',q:'Which uses "weird" correctly?',opts:['He has a weird salary.','That was a weird request — I didn\'t understand it.','Weird means the same as normal.','She made a weird saving.'],ans:1,exp:"'Weird' = strano/a. 'That was a weird request.'"},
+      {type:'mc',q:'"To hand out" means:',opts:['Consegnare a una persona','Distribuire a più persone','Buttare via','Tenere per sé'],ans:1,exp:"'To hand out' = distribuire a un gruppo."},
+      {type:'mc',q:'What is the opposite of "to make it on time"?',opts:['To be early','To oversleep','To be late / not to make it on time','To earn money'],ans:2,exp:"'To be late' = 'not to make it on time'."},
+      {type:'mc',q:'"Fault" is closest in meaning to:',opts:['Result','Blame/responsibility','Earnings','Savings'],ans:1,exp:"'Fault' = colpa. 'It\'s not my fault.'"},
+      {type:'fill',q:'Translate: "Non è colpa mia." → "It\'s not ___."',ans:["my fault"],exp:"'It's not my fault.' Very common in both casual and professional English."},
+      {type:'mc',q:'Which sentence uses "supplies" correctly?',opts:['I need to earn more supplies.','We handed out the supplies to the team.','The supplies was weird.','Supplies is my savings.'],ans:1,exp:"'We handed out the supplies to the team.' — materials/stock."},
+      {type:'mc',q:'"She keeps her desk very ___." (the opposite of messy)',opts:['weird','neat','overslept','faulty'],ans:1,exp:"'Neat' = ordinato, pulito, in ordine."},
+      {type:'fill',q:'"We need to leave now or we won\'t ___ on time."',ans:["make it"],exp:"'Make it on time' = riuscire ad arrivare puntuale."},
+    ]
+  },
+  {
+    id:'v_workplace', level:2, topic:'Workplace Vocabulary',
+    lesson:{
+      title:'Professional Workplace Vocabulary',
+      text:'In a <em>fast-paced</em> workplace, meeting <em>deadlines</em> is essential. A heavy <em>workload</em> can sometimes cause <em>burnout</em>, which is why good managers <em>delegate</em> tasks effectively. When things go wrong, it\'s important to <em>resolve</em> issues quickly and give clear <em>feedback</em> to your <em>colleagues</em>. <em>Implementing</em> new processes requires clear communication and a <em>straightforward</em> approach.',
+      vocab:[
+        {en:'deadline',it:'scadenza',ex:'The deadline for this report is Friday at noon.'},
+        {en:'workload',it:'carico di lavoro',ex:'My workload increased after the merger.'},
+        {en:'feedback',it:'riscontro/commento',ex:'The manager gave helpful feedback on my work.'},
+        {en:'colleague',it:'collega',ex:'I asked a colleague to review my presentation.'},
+        {en:'implement',it:'implementare',ex:'We plan to implement the new system next month.'},
+        {en:'resolve',it:'risolvere',ex:'We need to resolve this issue before the client call.'},
+        {en:'delegate',it:'delegare',ex:'A good manager knows how to delegate tasks.'},
+        {en:'straightforward',it:'semplice/chiaro',ex:'The process is quite straightforward.'},
+        {en:'fast-paced',it:'frenetico/rapido',ex:'AdTech is a fast-paced industry.'},
+        {en:'burnout',it:'esaurimento da lavoro',ex:'Working 70 hours a week leads to burnout.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'What does "deadline" mean?',opts:['Linea di partenza','Scadenza','Obiettivo','Orario di lavoro'],ans:1,exp:"'Deadline' = scadenza. 'The deadline is Friday' = la scadenza è venerdì."},
+      {type:'mc',q:'"To delegate" means:',opts:['Fare tutto da soli','Assegnare compiti ad altri','Rifiutare un lavoro','Chiedere aiuto al capo'],ans:1,exp:"'Delegate' = assegnare/affidare compiti ad altre persone."},
+      {type:'fill',q:'"I need to ___ this issue before the client call."',ans:["resolve"],exp:"'Resolve' = risolvere. Professional and precise word choice."},
+      {type:'mc',q:'Which sentence uses "feedback" correctly?',opts:['I deadline the feedback.','Please give me some feedback on my presentation.','The feedback was a straightforward workload.','She resolved the feedback.'],ans:1,exp:"'Give/provide/receive feedback' are the correct collocations."},
+      {type:'mc',q:'"The new process is quite ___." (easy to understand)',opts:['straightforward','overloaded','fast-paced','delegated'],ans:0,exp:"'Straightforward' = semplice, diretto, facile da capire."},
+      {type:'mc',q:'What causes "burnout"?',opts:['Taking too many holidays','Working excessively without rest','Getting too much feedback','Delegating too much'],ans:1,exp:"'Burnout' = esaurimento causato da stress e sovraccarico di lavoro."},
+      {type:'fill',q:'"We need to ___ the new tracking system by Q3."',ans:["implement"],exp:"'Implement' = mettere in pratica, implementare."},
+      {type:'mc',q:'"My ___ increased after my colleague left the company."',opts:['feedback','workload','deadline','colleague'],ans:1,exp:"'Workload' = carico di lavoro."},
+    ]
+  },
+  {
+    id:'v_adtech', level:3, topic:'AdTech & Digital Marketing Vocabulary',
+    lesson:{
+      title:'AdTech & Programmatic Advertising',
+      text:'In <em>programmatic advertising</em>, <em>impressions</em> are bought and sold in real time through an <em>auction</em>. Advertisers use a <em>DSP</em> (Demand-Side Platform) to bid on ad <em>inventory</em>, while publishers use an <em>SSP</em> (Supply-Side Platform) to sell it. Key <em>KPIs</em> include <em>CTR</em> (click-through rate), <em>CPM</em> (cost per mille), and <em>ROAS</em> (return on ad spend). <em>Viewability</em> measures whether an ad was actually seen, while <em>frequency capping</em> prevents showing the same ad too many times.',
+      vocab:[
+        {en:'impression',it:'visualizzazione annuncio',ex:'The campaign generated 5 million impressions.'},
+        {en:'CTR (click-through rate)',it:'tasso di click',ex:'Our CTR improved from 0.5% to 1.2%.'},
+        {en:'CPM (cost per mille)',it:'costo per mille impressioni',ex:'The average CPM for display ads is €3.'},
+        {en:'ROAS (return on ad spend)',it:'ritorno sulla spesa pubblicitaria',ex:'We achieved a ROAS of 4x.'},
+        {en:'programmatic',it:'programmatico',ex:'Programmatic buying automates ad purchasing.'},
+        {en:'inventory',it:'spazi pubblicitari disponibili',ex:'Premium publishers have limited inventory.'},
+        {en:'viewability',it:'visibilità',ex:'High viewability means the ad was actually seen.'},
+        {en:'frequency capping',it:'limite di frequenza',ex:'We set a frequency cap of 3 impressions per user.'},
+        {en:'DSP',it:'piattaforma lato domanda',ex:'We use DV360 as our DSP.'},
+        {en:'attribution',it:'attribuzione',ex:'Multi-touch attribution is complex but valuable.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'What does "impression" mean in AdTech?',opts:['Un commento positivo del cliente','Ogni volta che un annuncio viene mostrato','Il numero di click su un annuncio','Il costo di una campagna'],ans:1,exp:"'Impression' = una singola visualizzazione dell'annuncio."},
+      {type:'mc',q:'What does CTR stand for?',opts:['Cost to Run','Click-Through Rate','Campaign Total Revenue','Conversion Tracking Report'],ans:1,exp:"CTR = Click-Through Rate = (clicks ÷ impressions) × 100."},
+      {type:'fill',q:'"We achieved a ___ of 5x, meaning for every €1 spent we generated €5 in revenue."',ans:["ROAS","roas"],exp:"ROAS = Return on Ad Spend. A ROAS of 5x is excellent."},
+      {type:'mc',q:'"___ buying automates the purchasing of ad space in real time."',opts:['Traditional','Programmatic','Manual','Direct'],ans:1,exp:"'Programmatic' advertising uses technology to automate ad buying."},
+      {type:'mc',q:'What is "frequency capping"?',opts:['Il budget massimo giornaliero','Il limite di volte che un utente vede lo stesso annuncio','Il costo massimo per click','La data di fine campagna'],ans:1,exp:"Frequency capping = limite al numero di volte che un utente vede lo stesso annuncio."},
+      {type:'mc',q:'What does a DSP do?',opts:['Vende spazi pubblicitari per i publisher','Permette agli advertiser di comprare inventory','Misura la viewability degli annunci','Gestisce i social media'],ans:1,exp:"DSP (Demand-Side Platform) = piattaforma usata dagli advertiser per comprare inventory."},
+    ]
+  },
+  {
+    id:'v_interview', level:2, topic:'Job Interview Vocabulary',
+    lesson:{
+      title:'Language for Job Interviews',
+      text:'During a job <em>interview</em>, you need to <em>demonstrate</em> your <em>strengths</em> clearly. Interviewers often ask you to <em>elaborate</em> on your experience and to give <em>concrete</em> examples. Use the <em>STAR method</em> (Situation, Task, Action, Result) to <em>structure</em> your answers. Showing that you can <em>handle</em> challenges and <em>adapt</em> to change is essential. Don\'t forget to highlight your key <em>achievements</em> and <em>metrics</em>.',
+      vocab:[
+        {en:'elaborate',it:'approfondire/sviluppare',ex:"Could you elaborate on that experience?"},
+        {en:'demonstrate',it:'dimostrare',ex:'This project demonstrates my strategic thinking.'},
+        {en:'achievement',it:'risultato/traguardo',ex:'My biggest achievement was growing revenue by 40%.'},
+        {en:'concrete',it:'concreto/specifico',ex:'Give me a concrete example of when you led a team.'},
+        {en:'handle',it:'gestire/affrontare',ex:'I can handle tight deadlines effectively.'},
+        {en:'adapt',it:'adattarsi',ex:'I quickly adapted to the new tools.'},
+        {en:'strength',it:'punto di forza',ex:"My greatest strength is analytical thinking."},
+        {en:'structure',it:'strutturare',ex:'Structure your answer using the STAR method.'},
+        {en:'metrics',it:'metriche/dati',ex:'I always support my decisions with metrics.'},
+        {en:'relevant',it:'pertinente/rilevante',ex:'Please give a relevant example from your experience.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'"Could you ___ on that experience?" (explain more)',opts:['elaborate','adapt','handle','demonstrate'],ans:0,exp:"'Elaborate on' = approfondire, spiegare in modo più dettagliato."},
+      {type:'mc',q:'What is an "achievement"?',opts:['Un obiettivo futuro','Un risultato/traguardo ottenuto','Un punto di debolezza','Una domanda difficile'],ans:1,exp:"'Achievement' = qualcosa che hai ottenuto o raggiunto con successo."},
+      {type:'fill',q:'"My biggest ___ was increasing campaign ROI by 35%."',ans:["achievement"],exp:"'Achievement' = traguardo. Key word for interviews and CVs."},
+      {type:'mc',q:'"I always support my decisions with ___." (data)',opts:['elaborations','metrics','structures','concretes'],ans:1,exp:"'Metrics' = metriche, dati quantitativi. Very important in AdTech interviews."},
+      {type:'mc',q:'Which answer sounds most professional in an interview?',opts:["I did good stuff at my old job.","I achieved strong results by optimising our programmatic campaigns.","My job was good and I made money for the company.","I worked a lot."],ans:1,exp:"Professional: 'I achieved strong results by...' Specific, action-oriented, metric-driven."},
+    ]
+  },
+  {
+    id:'v_business_general', level:2, topic:'General Business Vocabulary',
+    lesson:{
+      title:'Core Business English Vocabulary',
+      text:'Successful businesses focus on their core <em>strategy</em> and ensure all <em>stakeholders</em> are aligned. A good <em>pitch</em> can win new clients, while a clear <em>proposal</em> sets expectations. Companies need to <em>scale</em> their operations to grow, often <em>leveraging</em> technology to do so. <em>Revenue</em> is the total income, while <em>profit</em> is what remains after costs. Understanding the difference between <em>gross</em> and <em>net</em> figures is essential in any business conversation.',
+      vocab:[
+        {en:'stakeholder',it:'portatore di interesse',ex:'All stakeholders approved the new strategy.'},
+        {en:'leverage',it:'sfruttare strategicamente',ex:'We can leverage our data to improve targeting.'},
+        {en:'revenue',it:'fatturato/entrate lorde',ex:'Q4 revenue exceeded our forecast.'},
+        {en:'profit',it:'profitto netto',ex:'Revenue was high, but profit was low due to costs.'},
+        {en:'scale',it:'scalare/crescere',ex:'We need to scale this solution across all markets.'},
+        {en:'pitch',it:'presentazione/proposta commerciale',ex:'She gave an excellent pitch to the investors.'},
+        {en:'pipeline',it:'flusso di opportunità',ex:'We have several deals in the pipeline.'},
+        {en:'benchmark',it:'punto di riferimento',ex:"Let's benchmark our KPIs against industry standards."},
+        {en:'ROI',it:'ritorno sull\'investimento',ex:'The campaign delivered a 3x ROI.'},
+        {en:'iterate',it:'migliorare progressivamente',ex:'We iterate on the product based on user feedback.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'"All ___ were invited to the strategy presentation."',opts:['pipelines','stakeholders','benchmarks','pitches'],ans:1,exp:"'Stakeholders' = tutte le persone con interesse nel risultato."},
+      {type:'mc',q:'"___ is the total income before costs are deducted."',opts:['Profit','Revenue','ROI','Pipeline'],ans:1,exp:"'Revenue' = fatturato lordo. 'Profit' = profitto netto (dopo i costi)."},
+      {type:'fill',q:'"We need to ___ this solution across all 21 markets."',ans:["scale"],exp:"'Scale' = espandere in modo efficiente."},
+      {type:'mc',q:'"We can ___ our first-party data to improve campaign targeting."',opts:['pitch','scale','leverage','iterate'],ans:2,exp:"'Leverage' = sfruttare strategicamente una risorsa."},
+      {type:'mc',q:'What is a "pitch"?',opts:['Un grafico di performance','Una presentazione per vendere un\'idea o servizio','Un tipo di budget','Una riunione interna'],ans:1,exp:"'Pitch' = presentazione commerciale o proposta per convincere qualcuno."},
+      {type:'fill',q:'"The ___ of the campaign was 4x — for every €1 spent, we generated €4."',ans:["ROI"],exp:"ROI = Return on Investment."},
+    ]
+  },
+],
+
+// ════════════════════════════════════════════════════════
+// BUSINESS ENGLISH
+// ════════════════════════════════════════════════════════
+business: [
+  {
+    id:'b_email', level:1, topic:'Professional Email Writing',
+    lesson:{
+      title:'Writing Professional Emails in English',
+      text:'A professional email should have a clear <em>subject line</em>, a polite <em>greeting</em>, a concise <em>body</em>, and a professional <em>closing</em>. Use formal language: "I am writing to..." instead of "I want to tell you...". When making requests, soften them with modals: "Could you please..." or "I would appreciate it if you could...". Always end with a <em>call to action</em> and sign off appropriately.',
+      vocab:[
+        {en:'I am writing to...',it:'Le scrivo per...',ex:'I am writing to follow up on our conversation.'},
+        {en:'Please find attached',it:'In allegato',ex:'Please find attached the report you requested.'},
+        {en:'I would appreciate it if',it:'Le sarei grato se',ex:'I would appreciate it if you could reply by Friday.'},
+        {en:'Looking forward to',it:'Non vedo l\'ora di',ex:'Looking forward to hearing from you.'},
+        {en:'As per our conversation',it:'Come da nostra conversazione',ex:'As per our conversation, I have updated the proposal.'},
+        {en:'I will follow up',it:'Farò un follow-up',ex:'I will follow up next week if I don\'t hear back.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'Which email opening is most professional?',opts:["Hey! I want to ask you something.","Dear Ms Johnson, I am writing to enquire about...","Hello, I need info.","Hi, can you help?"],ans:1,exp:"'Dear [Name], I am writing to...' is the standard formal email opening."},
+      {type:'mc',q:'How do you politely ask someone to do something in an email?',opts:["Do this now.","I need you to send the report.","Could you please send the report by Friday?","Send the report."],ans:2,exp:"'Could you please...' = polite request. Essential in professional communication."},
+      {type:'fill',q:'"___ attached the proposal you requested."',ans:["Please find","Please find attached"],exp:"'Please find attached...' = standard phrase when sending attachments."},
+      {type:'mc',q:'Which closing phrase is most appropriate for a formal email?',opts:["Bye!","See ya","Kind regards,","Later,"],ans:2,exp:"'Kind regards,' or 'Best regards,' are standard professional email closings."},
+      {type:'mc',q:'"___ our conversation, I have updated the timeline."',opts:['Regarding to','As per','According with','Based to'],ans:1,exp:"'As per our conversation' = come da nostra conversazione. Very common in business emails."},
+      {type:'fill',q:'"I look ___ to hearing from you."',ans:["forward"],exp:"'I look forward to hearing from you.' — standard email closing phrase."},
+      {type:'mc',q:'How do you say "In allegato troverà..."?',opts:['You can find attached...','Please find attached...','I attach hereby...','Attached is finding...'],ans:1,exp:"'Please find attached...' is the standard professional phrase."},
+      {type:'mc',q:'Which subject line is most effective?',opts:["Meeting","Quick question re: Q3 Campaign Review — action needed by Friday","Hi","FYI"],ans:1,exp:"Effective subject lines are specific and include a clear action or topic."},
+    ]
+  },
+  {
+    id:'b_meetings', level:2, topic:'Meeting Phrases',
+    lesson:{
+      title:'Chairing and Participating in Meetings',
+      text:'Whether you are <em>chairing</em> or attending a meeting, you need specific language. To start: "Shall we get started?" To add a point: "I\'d like to add..." To <em>interrupt</em> politely: "Sorry to interrupt, but..." To ask for <em>clarification</em>: "Could you clarify what you mean by...?" To <em>summarise</em>: "So to summarise, we\'ve agreed that..." To close: "I think that covers everything. Thanks everyone."',
+      vocab:[
+        {en:'to chair a meeting',it:'presiedere una riunione',ex:'She will chair the meeting on Thursday.'},
+        {en:'agenda',it:'ordine del giorno',ex:"Has everyone received today's agenda?"},
+        {en:'action points',it:'punti d\'azione',ex:"Let's review the action points from last week."},
+        {en:'take the floor',it:'prendere la parola',ex:'I\'d like to take the floor on this topic.'},
+        {en:'wrap up',it:'concludere/riassumere',ex:"Let's wrap up — we're running out of time."},
+        {en:'follow up',it:'dare seguito/monitorare',ex:'I will follow up on this after the meeting.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'How do you politely interrupt in a meeting?',opts:["Stop talking, I want to speak.","Sorry to interrupt, but I\'d like to add something.","Excuse me, you\'re wrong.","Let me talk now."],ans:1,exp:"'Sorry to interrupt, but...' = polite way to take the floor."},
+      {type:'mc',q:'"Could you ___ what you mean by \'scalable\'?" (ask to explain)',opts:['elaborate','clarify','interrupt','wrap'],ans:1,exp:"'Could you clarify...?' = chiedere chiarimenti in modo professionale."},
+      {type:'fill',q:'"Let\'s ___ — we\'re running out of time."',ans:["wrap up"],exp:"'Wrap up' = concludere, portare a termine una riunione."},
+      {type:'mc',q:'Which phrase is used to start a meeting professionally?',opts:["OK everyone, let\'s talk now.","Shall we get started? Thanks for joining today.","We start now.","Meeting!"],ans:1,exp:"'Shall we get started?' is a professional and common meeting opener."},
+      {type:'mc',q:'"I\'d like to ___ to the previous point." (add something)',opts:['wrap up','follow up','come back','chair'],ans:2,exp:"'I'd like to come back to...' = voglio tornare su un punto precedente."},
+      {type:'fill',q:'"Can everyone please look at the ___?" (list of topics to discuss)',ans:["agenda"],exp:"'Agenda' = ordine del giorno della riunione."},
+    ]
+  },
+  {
+    id:'b_interview_lang', level:2, topic:'Job Interview Language',
+    lesson:{
+      title:'STAR Method & Interview Language',
+      text:'In English job interviews, you will often hear: "Tell me about a time when..." or "Give me an example of...". Use the <em>STAR method</em>: <em>Situation</em> (context), <em>Task</em> (your responsibility), <em>Action</em> (what you did), <em>Result</em> (the outcome, with metrics if possible). Avoid vague answers — be <em>specific</em> and use <em>quantifiable</em> results. Strong openers: "In my role at [company], I was responsible for..." or "One challenge I faced was..."',
+      vocab:[
+        {en:'I was responsible for',it:'Ero responsabile di',ex:'I was responsible for managing a €5M annual budget.'},
+        {en:'I led',it:'Ho guidato',ex:'I led a cross-functional team of 8 people.'},
+        {en:'I achieved',it:'Ho ottenuto/raggiunto',ex:'I achieved a 40% increase in CTR.'},
+        {en:'I collaborated with',it:'Ho collaborato con',ex:'I collaborated with the sales team to align targets.'},
+        {en:'As a result',it:'Di conseguenza',ex:'As a result, revenue grew by 25%.'},
+        {en:'quantifiable',it:'quantificabile',ex:'Always include quantifiable results in your answers.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'Which answer is strongest in a job interview?',opts:["I did some campaigns.","I was responsible for managing €8M in media budget across 21 markets, achieving a 15% reduction in CPM.","I worked in advertising.","I did good work at my company."],ans:1,exp:"Strong answers: specific role + scope + quantifiable result. Always include numbers!"},
+      {type:'mc',q:'"Tell me about a time when you handled a difficult client." — What method should you use?',opts:['The ABC method','The STAR method','The 5W method','Free-form answer'],ans:1,exp:"STAR = Situation, Task, Action, Result. The industry standard for behavioural interview answers."},
+      {type:'fill',q:'"___ a result, we reduced CPA by 20% in Q2."',ans:["As"],exp:"'As a result' = di conseguenza. Connects your Action to your Result in a STAR answer."},
+      {type:'mc',q:'Which word shows professional ownership of a project?',opts:['I helped a little','I was around','I led the project from brief to delivery','I was there'],ans:2,exp:"'I led' shows clear ownership and leadership. Much stronger than 'I helped' or 'I was involved'."},
+      {type:'mc',q:'"I ___ with the sales and product teams to align our go-to-market strategy."',opts:['collaborated','did','went','made'],ans:0,exp:"'Collaborated with' = professional term for working together cross-functionally."},
+      {type:'fill',q:'"I ___ (be/responsible) for a team of 5 campaign managers."',ans:["was responsible for"],exp:"'I was responsible for...' — the gold standard opener for describing your role."},
+    ]
+  },
+  {
+    id:'b_negotiation', level:3, topic:'Negotiation & Persuasion',
+    lesson:{
+      title:'Negotiation Language in English',
+      text:'Effective negotiation requires <em>diplomatic</em> language. Instead of "No," say "That\'s an interesting point, however..." Instead of "That\'s too expensive," say "The budget is a concern — could we explore alternatives?" Use <em>hedging</em> language: "It might be worth considering...", "Perhaps we could...". Show <em>flexibility</em>: "We\'re open to..." and signal <em>compromise</em>: "If you could do X, we could consider Y."',
+      vocab:[
+        {en:'That\'s an interesting point, however...',it:'È un punto interessante, tuttavia...',ex:'Diplomatic way to disagree.'},
+        {en:'We\'re open to',it:'Siamo aperti a',ex:"We're open to adjusting the timeline."},
+        {en:'Could we explore',it:'Potremmo esplorare',ex:'Could we explore a phased approach?'},
+        {en:'It might be worth',it:'Potrebbe valere la pena',ex:"It might be worth testing a smaller budget first."},
+        {en:'If you could... we could...',it:'Se voi poteste... noi potremmo...',ex:'If you could extend the deadline, we could include more data.'},
+        {en:'reach an agreement',it:'raggiungere un accordo',ex:"I'm confident we can reach an agreement."},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'What is the most diplomatic way to disagree in a negotiation?',opts:["You're wrong.","That's an interesting point, however I see it differently.","No.","I disagree completely."],ans:1,exp:"Diplomatic disagreement: acknowledge their point, then present your view."},
+      {type:'mc',q:'"The budget is a concern — ___ we explore a phased approach?"',opts:['must','could','will','shall to'],ans:1,exp:"'Could we explore...' = polite suggestion in negotiation."},
+      {type:'fill',q:'"___ you could extend the deadline, we could deliver more comprehensive data."',ans:["If"],exp:"'If you could... we could...' = classic negotiation offer structure."},
+      {type:'mc',q:'Which phrase shows openness to compromise?',opts:["Take it or leave it.","We\'re open to discussing the terms.","This is our final offer.","We never negotiate."],ans:1,exp:"'We're open to...' shows flexibility and willingness to find a solution."},
+    ]
+  },
+],
+
+// ════════════════════════════════════════════════════════
+// LISTENING (story-based comprehension)
+// ════════════════════════════════════════════════════════
+listening: [
+  {
+    id:'l_gingerbread', level:1, topic:'Story: The Gingerbread House',
+    lesson:{
+      title:'Story: The Gingerbread House',
+      text:'Two brothers lived together after their sister was born and their parents needed her old bedroom. Every morning, the same thing happened: one of the brothers would <em>oversleep</em>. The boys had heard that a local shop was giving away free <em>gingerbread house kits</em> — but only to the first customers who arrived on time. Day after day, they tried. Day after day, one of them <em>overslept</em> and they didn\'t <em>make it on time</em>. Eventually, the boy decided he needed to <em>earn</em> money to simply buy one. "It\'s your <em>fault</em>," said one brother. "No, it\'s yours!" said the other. Meanwhile, his shoe was still sitting by the door — forgotten in the rush.',
+      vocab:[
+        {en:'make it on time',it:'arrivare in tempo',ex:"We need to hurry or we won't make it on time."},
+        {en:'gingerbread',it:'pan di zenzero',ex:'She baked a gingerbread house for Christmas.'},
+        {en:'eventually',it:'alla fine/infine',ex:'Eventually, he found a solution.'},
+        {en:'meanwhile',it:'nel frattempo',ex:'Meanwhile, the other brother was still asleep.'},
+        {en:'rush',it:'fretta',ex:"I forgot my keys in the rush."},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'Why did the brothers have to share a bedroom?',opts:['Their cousin came to visit','Their sister was born and parents needed a room','The house was too small','They wanted to'],ans:1,exp:"From the story: they had to share because their sister was born and their parents needed a room."},
+      {type:'mc',q:'What happened every morning?',opts:['Both brothers woke up early','One brother overslept every day','They argued about breakfast','They were always on time'],ans:1,exp:"'Everyday one of the brothers overslept' — the central problem."},
+      {type:'mc',q:'How much did the gingerbread house kits cost?',opts:['They were very expensive','They cost €5','They were free if you arrived on time','They were free for everyone'],ans:2,exp:"'If you make it on time they are for free.'"},
+      {type:'mc',q:'Did they ever make it on time?',opts:['Yes, on the last day','No, never','Yes, twice','We don\'t know'],ans:1,exp:"'No, they didn\'t.' — they never made it."},
+      {type:'mc',q:'Why was the boy looking for a job?',opts:['His parents told him to','He wanted to buy the kit himself','He was bored','He wanted to save money for travel'],ans:1,exp:"He had no money and wanted to buy the gingerbread house kit."},
+      {type:'fill',q:'"What ___ with your shoe?" (something happened to it)',ans:["happened","happened to"],exp:"'What happened to/with your shoe?' — asking about an unexpected event."},
+      {type:'mc',q:'Which phrase from the story means "arrivare in tempo"?',opts:['To oversleep','To hand out','To make it on time','To earn money'],ans:2,exp:"'To make it on time' = farcela in tempo, arrivare puntuale."},
+      {type:'mc',q:'"___ the other brother was still asleep." (allo stesso tempo)',opts:['Eventually','Meanwhile','Fortunately','However'],ans:1,exp:"'Meanwhile' = nel frattempo."},
+    ]
+  },
+  {
+    id:'l_workplace', level:2, topic:'Workplace Dialogue Comprehension',
+    lesson:{
+      title:'Understanding Workplace Conversations',
+      text:'<strong>Sarah:</strong> "Hi Tom, do you have a minute? I\'d like to <em>run something by you</em> before the meeting."\n<strong>Tom:</strong> "Sure, what\'s up?"\n<strong>Sarah:</strong> "The client has pushed back on the timeline. They\'re saying the campaign needs to go live two weeks earlier than planned."\n<strong>Tom:</strong> "That\'s a tight turnaround. Do we have all the <em>assets</em> ready?"\n<strong>Sarah:</strong> "Not yet. I was thinking we could <em>prioritise</em> the top three markets and <em>phase in</em> the rest."\n<strong>Tom:</strong> "That could work. Let\'s <em>loop in</em> the creative team and see what\'s feasible."',
+      vocab:[
+        {en:'run something by someone',it:'sottoporre qualcosa a qualcuno',ex:"Can I run this idea by you before I send it?"},
+        {en:'push back',it:'opporsi/respingere',ex:'The client pushed back on the new pricing.'},
+        {en:'tight turnaround',it:'tempi stretti',ex:'Two weeks is a tight turnaround for this campaign.'},
+        {en:'assets',it:'materiali creativi/risorse',ex:'We need all creative assets by Thursday.'},
+        {en:'phase in',it:'introdurre gradualmente',ex:"We'll phase in the remaining markets over Q2."},
+        {en:'loop in',it:'coinvolgere/includere',ex:'Please loop in the legal team on this.'},
+        {en:'feasible',it:'fattibile',ex:"Let's check if this timeline is feasible."},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'Why does Sarah want to talk to Tom?',opts:['To cancel the meeting','To discuss a client timeline change before the meeting','To ask for a holiday','To complain about the client'],ans:1,exp:"'I\'d like to run something by you before the meeting' — she has something to discuss."},
+      {type:'mc',q:'What is the client\'s request?',opts:['More budget','Campaign to go live two weeks earlier','A different creative approach','A longer timeline'],ans:1,exp:"The client pushed back on the timeline — they want the campaign earlier."},
+      {type:'fill',q:'"The client has ___ on the timeline." (opposed it)',ans:["pushed back"],exp:"'Push back' = opporsi, non essere d\'accordo su qualcosa."},
+      {type:'mc',q:'What does "loop in the creative team" mean?',opts:['Escludere il team creativo','Includere/coinvolgere il team creativo','Chiamare il team creativo','Mandare un report al team creativo'],ans:1,exp:"'Loop in' = includere qualcuno in una conversazione o progetto."},
+      {type:'mc',q:'What solution does Sarah propose?',opts:['Cancel the campaign','Launch all markets at once','Prioritise top 3 markets and phase in the rest','Ask the client for more time'],ans:2,exp:"'Prioritise the top three markets and phase in the rest' — a pragmatic compromise."},
+    ]
+  },
+  {
+    id:'l_interview_sim', level:2, topic:'Interview Listening Comprehension',
+    lesson:{
+      title:'Understanding Interview Questions',
+      text:'Interviewers use different question types. <em>Open questions</em>: "Tell me about yourself." "Walk me through your experience." <em>Behavioural questions</em>: "Tell me about a time when you dealt with a difficult stakeholder." <em>Situational questions</em>: "What would you do if a campaign underperformed?" <em>Competency questions</em>: "How do you prioritise when you have multiple deadlines?" Listen carefully — the question type tells you HOW to structure your answer.',
+      vocab:[
+        {en:'walk me through',it:'guidami attraverso / spiegami passo per passo',ex:'Walk me through your decision-making process.'},
+        {en:'deal with',it:'gestire/affrontare',ex:'Tell me about a time you dealt with a difficult client.'},
+        {en:'underperform',it:'non performare come previsto',ex:'What do you do when a campaign underperforms?'},
+        {en:'prioritise',it:'dare priorità',ex:'How do you prioritise when you have multiple deadlines?'},
+        {en:'competency',it:'competenza',ex:'This is a competency-based interview question.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'"___ me through your experience in programmatic advertising." What type of question is this?',opts:['Closed question','Open question / experience question','Trick question','Competency question'],ans:1,exp:"'Walk me through...' = open/experience question. Answer: chronological or thematic overview."},
+      {type:'mc',q:'You hear: "Tell me about a time when you managed conflicting priorities." What method should you use?',opts:['Describe your job title','Use STAR: Situation, Task, Action, Result','List your skills','Talk about your education'],ans:1,exp:"Behavioural questions ('Tell me about a time when...') always require a STAR answer."},
+      {type:'fill',q:'"How do you ___ when you have multiple deadlines?" (give priority)',ans:["prioritise","prioritize"],exp:"'How do you prioritise?' = common competency question about time management."},
+      {type:'mc',q:'Which is the strongest answer to "What would you do if a campaign underperformed?"',opts:["I would panic.","I would analyse the data, identify the underperforming elements, adjust the targeting and creative, and communicate the issue proactively to the client.","I would wait and see.","I would blame the client brief."],ans:1,exp:"Strong answer: structured, data-driven, proactive communication. Shows problem-solving."},
+    ]
+  },
+],
+
+// ════════════════════════════════════════════════════════
+// READING
+// ════════════════════════════════════════════════════════
+reading: [
+  {
+    id:'r_adtech_article', level:2, topic:'Reading: The Future of Retail Media',
+    lesson:{
+      title:'The Future of Retail Media Networks',
+      text:'<em>Retail media</em> has emerged as one of the fastest-growing segments in digital advertising. Retailers like Amazon, Walmart, and — in Europe — companies like ShopFully are building <em>first-party data</em> networks that allow brands to reach shoppers at the <em>point of purchase</em>. Unlike traditional display advertising, retail media offers <em>closed-loop attribution</em>, meaning advertisers can directly link ad <em>exposure</em> to actual sales. As <em>third-party cookies</em> disappear, first-party retail data is becoming increasingly <em>valuable</em>. Brands that invest now in retail media <em>partnerships</em> are building a competitive <em>advantage</em> that will be difficult to replicate.',
+      vocab:[
+        {en:'retail media',it:'media al dettaglio',ex:'Retail media allows brands to advertise within retail platforms.'},
+        {en:'first-party data',it:'dati proprietari',ex:'First-party data is collected directly from your own users.'},
+        {en:'point of purchase',it:'punto vendita / momento di acquisto',ex:'Ads at the point of purchase have high conversion rates.'},
+        {en:'closed-loop attribution',it:'attribuzione a ciclo chiuso',ex:'Closed-loop attribution connects ad exposure to actual purchases.'},
+        {en:'third-party cookies',it:'cookie di terze parti',ex:'Third-party cookies are being phased out by browsers.'},
+        {en:'competitive advantage',it:'vantaggio competitivo',ex:'Early movers in retail media gained a competitive advantage.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'According to the article, why is retail media growing?',opts:['Because TV advertising is declining','Because it offers closed-loop attribution and valuable first-party data','Because it is cheaper than social media','Because it is easier to manage'],ans:1,exp:"Retail media offers closed-loop attribution (connecting ads to sales) and valuable first-party data."},
+      {type:'mc',q:'What does "closed-loop attribution" allow advertisers to do?',opts:['Track where users go after seeing an ad','Directly link ad exposure to actual sales','Block competitor ads','Measure brand awareness only'],ans:1,exp:"'Closed-loop attribution' = directly connecting an ad impression to a purchase."},
+      {type:'fill',q:'"___ data is collected directly from your own customers." (dati proprietari)',ans:["first-party","First-party"],exp:"'First-party data' = data collected directly by the company from its own users."},
+      {type:'mc',q:'Why is first-party data becoming more valuable?',opts:['Because GDPR requires it','Because third-party cookies are disappearing','Because social media is declining','Because it is cheaper'],ans:1,exp:"As third-party cookies are phased out, first-party data becomes the primary targeting tool."},
+      {type:'mc',q:'What is a "competitive advantage"?',opts:['Un vantaggio che tutti hanno','Un vantaggio difficile da replicare dai concorrenti','Un tipo di annuncio pubblicitario','Una strategia di prezzo'],ans:1,exp:"'Competitive advantage' = qualcosa che ti dà un vantaggio rispetto ai concorrenti."},
+    ]
+  },
+  {
+    id:'r_interview_tips', level:2, topic:'Reading: Interview Tips for Tech Professionals',
+    lesson:{
+      title:'Cracking the Tech Interview in English',
+      text:'Preparing for an interview in English requires more than just language skills — it requires <em>confidence</em>, <em>structure</em>, and <em>cultural awareness</em>. In English-speaking business culture, interviewers value <em>conciseness</em>: get to the point quickly. They also value <em>specificity</em>: vague answers like "I\'m a hard worker" are less <em>compelling</em> than "I reduced campaign costs by 30% in six months." Practice answering out loud — not just in your head. Record yourself and listen back. Focus on your <em>pace</em> (not too fast), your <em>clarity</em>, and your use of <em>connecting phrases</em> like "As a result", "However", and "In addition."',
+      vocab:[
+        {en:'conciseness',it:'concisione',ex:'Conciseness is valued in English business culture.'},
+        {en:'specificity',it:'specificità',ex:'Specificity makes your answers more compelling.'},
+        {en:'compelling',it:'convincente/efficace',ex:'A compelling answer includes data and examples.'},
+        {en:'pace',it:'ritmo/velocità',ex:'Speak at a clear, steady pace.'},
+        {en:'clarity',it:'chiarezza',ex:'Clarity in communication is essential in interviews.'},
+        {en:'connecting phrases',it:'frasi di collegamento',ex:'"As a result", "However", "In addition" connect your ideas.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'According to the article, what do English-speaking interviewers value?',opts:['Long, detailed answers','Conciseness and specificity','Showing emotion','Talking about personal life'],ans:1,exp:"English business culture values conciseness (get to the point) and specificity (data and examples)."},
+      {type:'mc',q:'Which answer is more "compelling" according to the article?',opts:['"I am a hard worker."','"I reduced campaign costs by 30% in six months."','"I always try my best."','"I have worked for many years."'],ans:1,exp:"'Compelling' = convincente. Specific, quantified answers are always stronger."},
+      {type:'fill',q:'"Vague answers are less ___ than specific ones with data."',ans:["compelling"],exp:"'Compelling' = persuasivo, convincente, efficace."},
+      {type:'mc',q:'What practical advice does the article give?',opts:['Read a lot of English books','Practice answering out loud and record yourself','Only study grammar','Watch English movies'],ans:1,exp:"The article recommends: practice out loud, record yourself, listen back — for pace, clarity and structure."},
+      {type:'mc',q:'What are "connecting phrases"?',opts:['Parole per salutare','Frasi come "As a result", "However", "In addition"','Domande di follow-up','Titoli professionali'],ans:1,exp:"'Connecting phrases' = parole/frasi di collegamento che uniscono le idee nel discorso."},
+    ]
+  },
+  {
+    id:'r_growth_mindset', level:1, topic:'Reading: The Growth Mindset',
+    lesson:{
+      title:'The Growth Mindset and Language Learning',
+      text:'Learning a language as an adult requires a <em>growth mindset</em> — the belief that abilities can be <em>developed</em> through <em>dedication</em> and hard work. People with a fixed mindset believe that talent is <em>innate</em> and cannot change. People with a growth mindset see <em>mistakes</em> as <em>opportunities</em> to learn. When you make an error in English, don\'t say "I\'m bad at English" — say "I\'m still learning." Research shows that adults who embrace mistakes improve <em>faster</em> and reach higher levels of <em>fluency</em>. The key is to keep practising, stay <em>consistent</em>, and be patient with yourself.',
+      vocab:[
+        {en:'growth mindset',it:'mentalità di crescita',ex:"With a growth mindset, you see challenges as opportunities."},
+        {en:'dedication',it:'dedizione',ex:'Language learning requires dedication and consistency.'},
+        {en:'innate',it:'innato',ex:'Nobody is innately bad at languages — it takes practice.'},
+        {en:'fluency',it:'fluidità',ex:'Fluency comes with consistent practice over time.'},
+        {en:'consistent',it:'costante',ex:'Be consistent — practise a little every day.'},
+        {en:'embrace',it:'abbracciare/accettare',ex:'Embrace your mistakes — they help you improve.'},
+      ]
+    },
+    questions:[
+      {type:'mc',q:'What is a "growth mindset"?',opts:['Credere di non poter migliorare','Credere che le capacità si sviluppano con la pratica','Evitare gli errori','Studiare solo grammatica'],ans:1,exp:"Growth mindset = la convinzione che le proprie capacità si possano sviluppare con impegno e dedizione."},
+      {type:'mc',q:'According to the article, what should you say when you make an error?',opts:['"I\'m bad at English."','"I\'m still learning."','"I give up."','"This is too hard."'],ans:1,exp:"Growth mindset reframe: 'I'm still learning' instead of 'I'm bad at English.'"},
+      {type:'fill',q:'"Language learning requires ___ — practise a little every day."',ans:["consistency","dedication","consistent practice"],exp:"'Consistency' = costanza. Practice a little every day — better than a lot once a week."},
+      {type:'mc',q:'What does "innate" mean?',opts:['Acquisito con la pratica','Nato con qualcosa naturalmente','Difficile da capire','Costante'],ans:1,exp:"'Innate' = innato, qualcosa con cui si nasce naturalmente."},
+      {type:'mc',q:'How do adults with a growth mindset see mistakes?',opts:['Come fallimenti definitivi','Come opportunità di apprendimento','Come prova di scarso talento','Come qualcosa da nascondere'],ans:1,exp:"Growth mindset: mistakes are OPPORTUNITIES to learn, not evidence of failure."},
+    ]
+  }
+]
+}; // end DB
+
+// ── QUIZ ENGINE ────────────────────────────────────────
+let currentSection = null;
+let currentUnit = null;
+let currentUnitIdx = 0;
+let currentQ = 0;
+let sessionCorrect = 0;
+let answered = false;
+let sessionQuestions = [];
+
+function pickUnits(section) {
+  const units = DB[section];
+  if (!units) return [];
+  const lv = S.level;
+  // Weight by level proximity, include some review
+  let candidates = units.filter(u => Math.abs(u.level - lv) <= 1);
+  if (candidates.length === 0) candidates = units;
+  // Prioritise weak topics
+  candidates.sort((a,b) => {
+    const wa = S.weakTopics[a.topic]||0;
+    const wb = S.weakTopics[b.topic]||0;
+    return wb - wa;
+  });
+  return candidates;
+}
+
+function buildSession(section) {
+  const units = pickUnits(section);
+  if (!units.length) return [];
+  const qs = [];
+  // Interleave: lesson card + questions from multiple units
+  units.slice(0, Math.min(3, units.length)).forEach(unit => {
+    qs.push({type:'lesson', unit});
+    const uqs = [...unit.questions].sort(()=>Math.random()-0.5).slice(0, Math.ceil(8/Math.min(3,units.length)));
+    uqs.forEach(q => qs.push({type:'question', q, topic:unit.topic, unitId:unit.id}));
+  });
+  return qs;
+}
+
+// ── PAGE RENDERING ─────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const nav=document.getElementById('nav-'+page);
+  if(nav)nav.classList.add('active');
+  if(page==='home')renderHome();
+  else if(page==='report')renderReport();
+  else renderStudyPage(page);
+}
+
+function renderHome(){
+  const acc=S.totalAnswered?Math.round(S.totalCorrect/S.totalAnswered*100):0;
+  const recent=S.history.slice(-6).reverse();
+  document.getElementById('main-content').innerHTML=`
+    <div class="page-header">
+      <h1 class="page-title">Ciao Elio 👋</h1>
+      <div class="page-sub">Your adaptive English learning journey — <strong>Level ${lvlName()}</strong></div>
+    </div>
+    <div class="section-grid">
+      <div class="metric-card"><div class="metric-num">${S.totalAnswered}</div><div class="metric-lbl">Questions answered</div></div>
+      <div class="metric-card"><div class="metric-num">${acc}%</div><div class="metric-lbl">Overall accuracy</div></div>
+      <div class="metric-card"><div class="metric-num">${lvlName()}</div><div class="metric-lbl">Current level</div></div>
+      <div class="metric-card"><div class="metric-num">${Object.keys(S.weakTopics).length}</div><div class="metric-lbl">Topics to review</div></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:500;font-size:15px;margin-bottom:1rem">Choose a section to study</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px">
+        ${[['grammar','📚 Grammar'],['vocab','🔤 Vocabulary'],['business','💼 Business English'],['listening','🎧 Listening'],['reading','📖 Reading']].map(([s,l])=>`
+          <button onclick="showPage('${s}')" class="topic-btn" style="padding:14px;text-align:center">${l}</button>`).join('')}
+      </div>
+    </div>
+    ${recent.length?`<div class="card">
+      <div style="font-weight:500;font-size:15px;margin-bottom:.75rem">Recent sessions</div>
+      ${recent.map(h=>`<div class="history-row">
+        <div><div style="font-weight:500;font-size:13px">${h.section} — ${h.topic}</div><div style="font-size:11px;color:var(--muted)">${h.date}</div></div>
+        <span class="badge ${h.correct/h.total>=.7?'badge-ok':'badge-warn'}">${h.correct}/${h.total}</span>
+      </div>`).join('')}
+    </div>`:''}
+    ${Object.keys(S.weakTopics).length?`<div class="card" style="border-color:#FFB74D">
+      <div style="font-weight:500;font-size:15px;margin-bottom:.75rem;color:#7B4A00">📌 Topics to review</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${Object.entries(S.weakTopics).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([t])=>`<span class="badge badge-warn">${t}</span>`).join('')}
+      </div>
+    </div>`:''}
+  `;
+}
+
+function renderStudyPage(section) {
+  currentSection = section;
+  sessionQuestions = buildSession(section);
+  currentQ = 0;
+  sessionCorrect = 0;
+  answered = false;
+
+  const sectionNames = {grammar:'Grammar',vocab:'Vocabulary',business:'Business English',listening:'Listening',reading:'Reading'};
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <h1 class="page-title">${sectionNames[section]||section}</h1>
+      <div class="page-sub">Level ${lvlName()} · ${sessionQuestions.filter(q=>q.type==='question').length} questions</div>
+    </div>
+    <div id="levelup-banner" class="levelup-banner"></div>
+    <div id="session-area"></div>
+  `;
+  renderSessionStep();
+}
+
+function renderSessionStep(){
+  if(currentQ >= sessionQuestions.length){renderSessionResult();return;}
+  const step = sessionQuestions[currentQ];
+  if(step.type==='lesson') renderLessonCard(step.unit);
+  else renderQuestionCard(step.q, step.topic, step.unitId);
+
+  if(pendingLevelUp){
+    pendingLevelUp=false;
+    const el=document.getElementById('levelup-banner');
+    if(el){el.classList.add('show');el.innerHTML=`<strong style="font-family:'Lora',serif;font-size:17px;color:var(--gold)">Level Up! 🎉</strong><div style="font-size:13px;color:var(--muted);margin-top:4px">You've reached <strong>${lvlName()}</strong>. Questions are now more challenging!</div>`;
+    setTimeout(()=>el.classList.remove('show'),4000)}
+  }
+}
+
+function renderLessonCard(unit){
+  const l = unit.lesson;
+  let vocabHTML='';
+  if(l.vocab){
+    vocabHTML=`<div class="vocab-grid">${l.vocab.map(v=>`
+      <div class="vocab-chip"><div class="vocab-en">${v.en}</div><div class="vocab-it">${v.it}</div>${v.ex?`<div class="vocab-it" style="margin-top:3px;font-style:italic">"${v.ex}"</div>`:''}</div>`).join('')}</div>`;
+  }
+  const isGrammar = !!l.rule;
+  const isReading = !!l.text && !l.rule;
+
+  let contentHTML='';
+  if(isGrammar){
+    const exHTML=(l.examples||[]).map(e=>`<div class="grammar-ex"><div class="en">✦ ${e.en}</div><div class="it">${e.it}</div></div>`).join('');
+    contentHTML=`<div class="grammar-box">
+      <div class="grammar-label">📚 Grammar — ${l.title}</div>
+      <div class="grammar-rule">${l.rule}</div>
+      ${l.rule_it?`<div style="font-size:12px;color:var(--accent);margin-bottom:.5rem;font-style:italic">🇮🇹 ${l.rule_it}</div>`:''}
+      ${exHTML}
+      ${l.error?`<div class="error-note">${l.error}</div>`:''}
+    </div>`;
+  } else {
+    contentHTML=`<div class="reading-box">
+      <div class="reading-label">${unit.id.startsWith('l_')?'🎧 Listening':'📖 Reading'} — ${l.title}</div>
+      <div class="reading-text">${l.text.replace(/\n/g,'<br>')}</div>
+      ${vocabHTML}
+    </div>`;
+  }
+
+  const reviewNote = S.weakTopics[unit.topic]?`<div class="review-banner">📌 You struggled with <strong>${unit.topic}</strong> before. Pay attention to the explanation!</div>`:'';
+
+  document.getElementById('session-area').innerHTML=`
+    ${reviewNote}
+    ${contentHTML}
+    <div style="text-align:right">
+      <button class="btn-check" onclick="nextStep()">Start questions →</button>
+    </div>
+  `;
+}
+
+function renderQuestionCard(q, topic, unitId){
+  const allQs = sessionQuestions.filter(s=>s.type==='question');
+  const qIdx = sessionQuestions.slice(0,currentQ).filter(s=>s.type==='question').length;
+  const totalQs = allQs.length;
+  answered = false;
+
+  const dotsHTML = allQs.map((_,i)=>{
+    const stepIdx = sessionQuestions.findIndex((s,si)=>s.type==='question'&&sessionQuestions.slice(0,si+1).filter(x=>x.type==='question').length===i+1);
+    const done = i<qIdx;
+    const cur = i===qIdx;
+    const wasCorrect = done && sessionQuestions[stepIdx]&&sessionQuestions[stepIdx]._result==='correct';
+    return `<div class="dot ${done?(wasCorrect?'done':'wrong-dot'):cur?'current':''}"></div>`;
+  }).join('');
+
+  let inputHTML='';
+  if(q.type==='mc'){
+    inputHTML=`<div class="options">${q.opts.map((o,i)=>`<button class="opt" onclick="checkMC(${i})" id="opt-${i}">${o}</button>`).join('')}</div>`;
+  } else {
+    inputHTML=`<div class="fill-row"><input class="fill-input" id="fill-input" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')checkFill()"/><button class="btn-check" onclick="checkFill()">Check</button></div>`;
+  }
+
+  document.getElementById('session-area').innerHTML=`
+    <div class="card">
+      <div class="quiz-progress">
+        <span>${qIdx+1}/${totalQs}</span>
+        <div class="progress-dots">${dotsHTML}</div>
+        <span>${sessionCorrect} correct</span>
+      </div>
+      <div class="qtag">${lvlName()} · ${topic} · ${q.type==='mc'?'Multiple choice':'Fill in'}</div>
+      <div class="qtext">${q.q}</div>
+      ${inputHTML}
+      <div class="feedback-box" id="feedback"></div>
+      <button class="next-btn" id="next-btn" onclick="nextStep()">${qIdx+1<totalQs?'Next →':'See results →'}</button>
+    </div>
+  `;
+}
+
+function checkMC(idx){
+  if(answered)return;
+  answered=true;
+  const step=sessionQuestions[currentQ];
+  const q=step.q;
+  document.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+  const correct=idx===q.ans;
+  document.getElementById('opt-'+idx).classList.add(correct?'correct':'wrong');
+  if(!correct)document.getElementById('opt-'+q.ans).classList.add('reveal');
+  showFeedback(correct,q.exp||'');
+  recordAnswer(correct,step.topic||'');
+  step._result=correct?'correct':'wrong';
+}
+
+function checkFill(){
+  if(answered)return;
+  const input=document.getElementById('fill-input');
+  if(!input)return;
+  answered=true;
+  const step=sessionQuestions[currentQ];
+  const q=step.q;
+  const val=input.value.toLowerCase().trim().replace(/[?.!,]/g,'');
+  const acc=Array.isArray(q.ans)?q.ans:[q.ans];
+  const correct=acc.some(a=>{const c=a.toLowerCase().trim().replace(/[?.!,]/g,'');return val===c||val.includes(c)||c.includes(val)});
+  input.classList.add(correct?'correct':'wrong');
+  input.disabled=true;
+  showFeedback(correct,q.exp||'');
+  recordAnswer(correct,step.topic||'');
+  step._result=correct?'correct':'wrong';
+}
+
+function showFeedback(correct,exp){
+  const fb=document.getElementById('feedback');
+  fb.className='feedback-box show '+(correct?'ok':'bad');
+  fb.innerHTML=`<strong>${correct?'✓ Correct!':'✗ Not quite'}</strong>${exp?' — '+exp:''}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextStep(){
+  currentQ++;
+  renderSessionStep();
+}
+
+function renderSessionResult(){
+  const total=sessionQuestions.filter(s=>s.type==='question').length;
+  const pct=total?Math.round(sessionCorrect/total*100):0;
+  const msg=pct>=80?'Excellent! 🎉':pct>=60?'Good effort — keep going!':'Keep practising — consistency is key!';
+  S.history.push({section:currentSection,topic:currentSection,correct:sessionCorrect,total,date:new Date().toLocaleDateString('en-GB')});
+  saveS();
+  document.getElementById('session-area').innerHTML=`
+    <div class="card" style="text-align:center;padding:2.5rem 1.5rem">
+      <div style="font-family:'Lora',serif;font-size:42px;font-weight:300;color:var(--accent)">${sessionCorrect}/${total}</div>
+      <div style="font-size:15px;color:var(--muted);margin-bottom:.5rem">${pct}% correct</div>
+      <div style="font-size:14px;color:var(--text);margin-bottom:2rem">${msg}</div>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <button class="btn-check" onclick="renderStudyPage('${currentSection}')">New session →</button>
+        <button onclick="showPage('home')" style="padding:10px 20px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Dashboard</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderReport(){
+  const acc=S.totalAnswered?Math.round(S.totalCorrect/S.totalAnswered*100):0;
+  const weak=Object.entries(S.weakTopics).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const strong=Object.entries(S.strongTopics).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  document.getElementById('main-content').innerHTML=`
+    <div class="page-header">
+      <h1 class="page-title">Progress Report</h1>
+      <div class="page-sub">Student: Elio Colasanto · ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+    <div class="section-grid">
+      <div class="metric-card"><div class="metric-num">${S.totalAnswered}</div><div class="metric-lbl">Questions answered</div></div>
+      <div class="metric-card"><div class="metric-num">${acc}%</div><div class="metric-lbl">Accuracy</div></div>
+      <div class="metric-card"><div class="metric-num">${lvlName()}</div><div class="metric-lbl">Current level</div></div>
+      <div class="metric-card"><div class="metric-num">${S.xpTotal}</div><div class="metric-lbl">Total XP</div></div>
+    </div>
+    ${weak.length?`<div class="card"><div style="font-weight:500;font-size:15px;margin-bottom:.75rem">Topics to strengthen 📌</div>${weak.map(([t,n])=>`<div class="history-row"><span style="font-size:13px">${t}</span><span class="badge badge-warn">${n} errors</span></div>`).join('')}</div>`:''}
+    ${strong.length?`<div class="card"><div style="font-weight:500;font-size:15px;margin-bottom:.75rem">Strong areas ✅</div>${strong.map(([t,n])=>`<div class="history-row"><span style="font-size:13px">${t}</span><span class="badge badge-ok">${n} correct</span></div>`).join('')}</div>`:''}
+    <div class="card"><div style="font-weight:500;font-size:15px;margin-bottom:.75rem">Session history</div>
+      ${S.history.length?S.history.slice(-12).reverse().map(h=>`<div class="history-row">
+        <div><div style="font-size:13px;font-weight:500">${h.section} — ${h.topic}</div><div style="font-size:11px;color:var(--muted)">${h.date}</div></div>
+        <span class="badge ${h.correct/h.total>=.7?'badge-ok':'badge-warn'}">${h.correct}/${h.total} (${Math.round(h.correct/h.total*100)}%)</span>
+      </div>`).join(''):'<div style="font-size:13px;color:var(--muted)">No sessions yet — start studying!</div>'}
+    </div>
+    <div class="card" style="background:var(--accent-light);border-color:#B8D4C8">
+      <div style="font-weight:500;font-size:15px;margin-bottom:.5rem;color:var(--accent)">Share this report</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">To share with your teacher: press <strong>Ctrl+P</strong> (or Cmd+P on Mac) and save as PDF. Then email the PDF together with your app link: <strong>https://eliocola.github.io/english-tutor/</strong></div>
+    </div>
+  `;
+}
+
+// ── INIT ───────────────────────────────────────────────
+function updateStreak(){
+  const today=new Date().toDateString();
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(S.lastDate===today)return;
+  if(S.lastDate===yesterday)S.streak++;
+  else S.streak=1;
+  S.lastDate=today;saveS();
+}
+updateStreak();
+updateSidebar();
+showPage('home');
+</script>
+</body>
+</html>
